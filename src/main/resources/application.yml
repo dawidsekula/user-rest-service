@@ -1,0 +1,9 @@
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/user_rest_service_database?serverTimezone=CET
+    username: root
+    password: root
+  jpa:
+    database: mysql
+    hibernate:
+      ddl-auto: create
