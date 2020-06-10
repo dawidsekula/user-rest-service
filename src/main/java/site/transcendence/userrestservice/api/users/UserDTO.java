@@ -1,16 +1,17 @@
 package site.transcendence.userrestservice.api.users;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
+import site.transcendence.userrestservice.api.roles.RoleDTO;
 
 import java.io.Serializable;
+import java.util.Set;
 
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString
-@EqualsAndHashCode
 
 public class UserDTO implements Serializable {
 
@@ -20,5 +21,7 @@ public class UserDTO implements Serializable {
     private Long id;
     private String username;
     private String email;
+
+    private Set<RoleDTO> roles;
 
 }
