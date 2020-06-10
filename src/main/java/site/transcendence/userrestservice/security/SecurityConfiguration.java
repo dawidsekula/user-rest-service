@@ -25,21 +25,25 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .csrf().disable().httpBasic()
                 .and()
 
-                .authorizeRequests()
+                /*
+                Authorization requests
+                */
+                .authorizeRequests() // Authorize all following requests
+                .antMatchers(HttpMethod.POST, SecurityConstant.SIGN_UP_URL).permitAll() // POST request for signing up URL
+                .anyRequest().authenticated() // All requests for authenticated users
 
-                // Allowing access to register url
-                .antMatchers(HttpMethod.POST, SecurityConstant.SIGN_UP_URL).permitAll()
-
-                // Allowing access to all authenticated users
-                .anyRequest().authenticated()
                 .and()
 
-                // Adding custom JWT filters
-                .addFilter(new JWTAuthenticationFilter(authenticationManager()))
-                .addFilter(new JWTAuthorizationFilter(authenticationManager()))
+                /*
+                Custom authorization and authentication filters
+                 */
+                .addFilter(new JWTAuthenticationFilter(authenticationManager())) // JWT authentication (login attempt with token creation)
+                .addFilter(new JWTAuthorizationFilter(authenticationManager())) // JWT authorization (authenticating requests with token)
 
-                // Disabling session creation
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+                /*
+                Other settings
+                */
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS); // Disabling session creation
 
     }
 

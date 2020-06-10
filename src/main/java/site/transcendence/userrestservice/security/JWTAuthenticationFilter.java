@@ -21,6 +21,9 @@ import java.util.Date;
 
 import static site.transcendence.userrestservice.security.SecurityConstant.*;
 
+/**
+ * Class is responsible for authenticating user while logging into application and generating personalized token after successful attempt
+ */
 public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
     private AuthenticationManager authenticationManager;
@@ -29,12 +32,22 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         this.authenticationManager = authenticationManager;
     }
 
+    /**
+     * User sends login request with credentials like i.e. username and password
+     * Credentials are passed to AuthenticationManager
+     *
+     * @param request contains object with login credentials needed for acquiring access
+     * @return Authentication object with given credentials
+     * @throws AuthenticationException when given credentials are not valid and authentication cannot be granted
+     */
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
         try {
+            // Mapping data from request to custom log-in request UserLogInRequest
             UserLogInRequest credentials = new ObjectMapper()
                     .readValue(request.getInputStream(), UserLogInRequest.class);
 
+            // Passing given data to AuthenticationManager
             return authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
                             credentials.getUsername(),
@@ -46,16 +59,26 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         }
     }
 
+    /**
+     * Successful authentication creates personalized token for the user which is set to the header
+     * named in constant SecurityConstant.HEADER_STRING together with SecurityConstant.TOKEN_PREFIX
+     * i.e. "Authentication | Bearer <token>"
+     *
+     * Token valid time is set in constant SecurityConstant.LOGIN_AUTHENTICATION_EXPIRATION_TIME
+     * and is encrypted using String value set in constant SecurityConstant.TOKEN_SECRET
+     */
     @Override
     protected void successfulAuthentication(HttpServletRequest request,
                                             HttpServletResponse response,
                                             FilterChain chain,
                                             Authentication authResult) throws IOException, ServletException {
+        // Creating personalized token
         String token = JWT.create()
-                .withSubject(((User) authResult.getPrincipal()).getUsername())
-                .withExpiresAt(new Date(System.currentTimeMillis() + LOGIN_AUTHENTICATION_EXPIRATION_TIME))
-                .sign(Algorithm.HMAC512(TOKEN_SECRET.getBytes()));
+                .withSubject(((User) authResult.getPrincipal()).getUsername()) // Getting user's username
+                .withExpiresAt(new Date(System.currentTimeMillis() + LOGIN_AUTHENTICATION_EXPIRATION_TIME)) // Setting expiration time of token
+                .sign(Algorithm.HMAC512(TOKEN_SECRET.getBytes())); // Encrypting token
 
+        // Creating header with created token
         response.addHeader(HEADER_STRING, TOKEN_PREFIX + token);
     }
 }

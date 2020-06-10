@@ -16,44 +16,61 @@ import java.util.ArrayList;
 
 import static site.transcendence.userrestservice.security.SecurityConstant.*;
 
+/**
+ * Class is responsible for giving authorization to the user after verifying given in header token
+ */
 public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
 
     public JWTAuthorizationFilter(AuthenticationManager authManager) {
         super(authManager);
     }
 
+    /**
+     * Method checks if request contains header with authentication token and adds authentication
+     * to the application's security context if existing token is valid
+     *
+     * Then it passes request and response to next filter in chain
+     */
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain chain) throws IOException, ServletException {
-        String header = request.getHeader(HEADER_STRING);
+        // Getting token from header named after constant's SecurityConstant.HEADER_STRING value i.e. Authorization
+        String token = request.getHeader(HEADER_STRING);
 
-        if (header == null || !header.startsWith(TOKEN_PREFIX)){
+        // If token is missing or does not start with value set it SecurityConstant.TOKEN_PREFIX
+        // JWT authorization cannot be verified and granted so request and response are passed to next filter in chain
+        if (token == null || !token.startsWith(TOKEN_PREFIX)){
             chain.doFilter(request, response);
             return;
         }
 
-        UsernamePasswordAuthenticationToken authentication = getAuthentication(request);
+        // Token is passed to getAuthentication() method which returns authentication based on valid token
+        UsernamePasswordAuthenticationToken authentication = getAuthentication(token);
 
+        // Passing authentication to application's security context
         SecurityContextHolder.getContext().setAuthentication(authentication);
+        // Passing request and response to the next filter in chain
         chain.doFilter(request, response);
     }
 
-    private UsernamePasswordAuthenticationToken getAuthentication(HttpServletRequest request){
-        String token = request.getHeader(HEADER_STRING);
 
-        if (token != null){
-            String user = JWT.require(Algorithm.HMAC512(TOKEN_SECRET))
-                    .build()
-                    .verify(token.replace(TOKEN_PREFIX, ""))
-                    .getSubject();
-            if (user != null){
-                return new UsernamePasswordAuthenticationToken(user, null, new ArrayList<>());
-            }
-            return null;
+    /**
+     * Method gets token for validation and returns authentication if token is valid
+     *
+     * @param token value from request's header
+     * @return authentication object
+     */
+    private UsernamePasswordAuthenticationToken getAuthentication(String token) {
+        String user = JWT.require(Algorithm.HMAC512(TOKEN_SECRET)) // Decrypting token requires the same 'key' it was encrypted by
+                .build()
+                .verify(token.replace(TOKEN_PREFIX, "")) // Verifying token's validation
+                .getSubject(); // Getting subject/user from decrypted token's data
+        if (user != null) { // If user is not null, authentication for this user is created
+            return new UsernamePasswordAuthenticationToken(user, null, new ArrayList<>());
         }
-        return null;
-    }
 
+        return null; // If user is null, null is returned giving no authentication
+    }
 
 }
