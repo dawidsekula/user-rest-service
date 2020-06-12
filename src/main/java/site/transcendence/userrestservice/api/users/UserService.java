@@ -24,5 +24,7 @@ public interface UserService extends UserDetailsService {
 
     // OTHERS
     List<GrantedAuthority> getUserAuthorities(String username);
+//    List<UserDTO> getUsersByRoles(String... roleName);
+//    List<UserDTO> getUsersByAuthorities(String... authorityName);
 
 }

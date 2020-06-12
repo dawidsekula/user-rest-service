@@ -26,7 +26,7 @@ import java.util.List;
 import static site.transcendence.userrestservice.security.SecurityConstant.*;
 
 /**
- * Class is responsible for authenticating user while logging into application and generating personalized token after successful attempt
+ * Class is responsible for generating JSON Web Token after successful log-in attempt and passing it to response's header
  */
 public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
@@ -37,10 +37,10 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     }
 
     /**
-     * User sends login request with credentials like i.e. username and password
+     * User sends log-in request with credentials like username and password
      * Credentials are passed to AuthenticationManager
      *
-     * @param request contains object with login credentials needed for acquiring access
+     * @param request contains object with log-in credentials needed for acquiring access
      * @return Authentication object with given credentials
      * @throws AuthenticationException when given credentials are not valid and authentication cannot be granted
      */
@@ -64,12 +64,14 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     }
 
     /**
-     * Successful authentication creates personalized token for the user which is set to the header
-     * named in constant SecurityConstant.HEADER_STRING together with SecurityConstant.TOKEN_PREFIX
-     * i.e. "Authentication | Bearer <token>"
+     * Successful authentication creates JSON Web Token for the user which is passed to the header
+     * named after constant's SecurityConstant.HEADER_STRING value along with SecurityConstant.TOKEN_PREFIX
+     * constant's value
      *
-     * Token valid time is set in constant SecurityConstant.LOGIN_AUTHENTICATION_EXPIRATION_TIME
-     * and is encrypted using String value set in constant SecurityConstant.TOKEN_SECRET
+     * Token valid time is set as constant's SecurityConstant.LOGIN_AUTHENTICATION_EXPIRATION_TIME value
+     * and is signed with constant's SecurityConstant.TOKEN_SECRET value
+     *
+     * NOTE Token is used for authentication only and user's authorities SHOULD NOT be included
      */
     @Override
     protected void successfulAuthentication(HttpServletRequest request,

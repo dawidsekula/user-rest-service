@@ -24,11 +24,9 @@ public interface UserMapper {
     Mapping between UserDTO and UserEntity
      */
     UserEntity toEntity(UserDTO source);
-
     UserDTO toDTO(UserEntity source);
 
     void copy(UserEntity source, @MappingTarget UserDTO target);
-
     void copy(UserDTO source, @MappingTarget UserEntity target);
 
     /*

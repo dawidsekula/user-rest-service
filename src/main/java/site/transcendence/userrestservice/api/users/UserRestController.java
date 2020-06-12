@@ -1,6 +1,8 @@
 package site.transcendence.userrestservice.api.users;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import site.transcendence.userrestservice.api.requests.UserCreateRequest;
 
@@ -19,6 +21,7 @@ public class UserRestController {
         return userService.createUser(request);
     }
 
+    @PreAuthorize("#username == authentication.name or hasRole('ROLE_ADMIN')")
     @GetMapping("/{username}")
     public UserDTO getUser(@PathVariable("username") String username){
         return userService.getUser(username);
@@ -29,6 +32,7 @@ public class UserRestController {
         return userService.getUsers();
     }
 
+    @Secured({"ROLE_ADMIN"})
     @DeleteMapping("/{username}")
     public String deleteUser(@PathVariable("username") String username){
         userService.deleteUser(username);
