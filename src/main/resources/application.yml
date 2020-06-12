@@ -3,7 +3,8 @@ spring:
     url: jdbc:mysql://localhost:3306/user_rest_service_database?serverTimezone=CET
     username: root
     password: root
+    initialization-mode: always
   jpa:
     database: mysql
     hibernate:
-      ddl-auto: create
+      ddl-auto: create-drop

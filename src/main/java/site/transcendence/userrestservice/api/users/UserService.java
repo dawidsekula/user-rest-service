@@ -22,4 +22,7 @@ public interface UserService extends UserDetailsService {
     // DELETE
     void deleteUser(String username);
 
+    // OTHERS
+    List<GrantedAuthority> getUserAuthorities(String username);
+
 }

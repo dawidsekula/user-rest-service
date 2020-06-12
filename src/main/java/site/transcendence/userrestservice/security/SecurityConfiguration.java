@@ -20,8 +20,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     private UserService userService;
     @Autowired
     private PasswordEncoder passwordEncoder;
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -43,7 +41,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
                 // Adding custom JWT filters
                 .addFilter(new JWTAuthenticationFilter(authenticationManager()))
-                .addFilter(new JWTAuthorizationFilter(authenticationManager(), jdbcTemplate))
+                .addFilter(new JWTAuthorizationFilter(authenticationManager(), userService))
 
                 // Disabling session creation
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);

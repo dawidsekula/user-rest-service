@@ -6,14 +6,12 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import site.transcendence.userrestservice.api.requests.UserCreateRequest;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -95,13 +93,12 @@ public class UserServiceImpl implements UserService {
 
         return User.withUsername(foundUser.getUsername())
                 .password(foundUser.getEncryptedPassword())
-                //.roles("USER")
                 .authorities(authorities)
-//                .roles(foundUser.getRole().getName())
                 .build();
     }
 
-    private List<GrantedAuthority> getUserAuthorities(String username){
+    @Override
+    public List<GrantedAuthority> getUserAuthorities(String username){
         return jdbcTemplate.queryForList(
                 "SELECT r.name " +
                         "FROM roles r " +

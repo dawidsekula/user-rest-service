@@ -15,6 +15,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import site.transcendence.userrestservice.api.users.UserService;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -30,12 +31,11 @@ import static site.transcendence.userrestservice.security.SecurityConstant.*;
 
 public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
 
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
+    private UserService userService;
 
-    public JWTAuthorizationFilter(AuthenticationManager authManager, JdbcTemplate jdbcTemplate) {
+    public JWTAuthorizationFilter(AuthenticationManager authManager, UserService userService) {
         super(authManager);
-        this.jdbcTemplate = jdbcTemplate;
+        this.userService = userService;
     }
 
     @Override
@@ -65,17 +65,7 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
                     .getSubject();
 
             if (user != null) {
-                List<SimpleGrantedAuthority> authorities = jdbcTemplate.queryForList(
-                        "SELECT r.name " +
-                                "FROM roles r " +
-                                "INNER JOIN users_roles ur ON ur.role_id=r.role_id " +
-                                "INNER JOIN users u ON u.user_id=ur.user_id " +
-                                "WHERE u.username = ?" +
-                                "AND ur.user_id = u.user_id", String.class, user)
-                        .stream()
-                        .map(SimpleGrantedAuthority::new)
-                        .collect(Collectors.toList());
-
+                List<GrantedAuthority> authorities = userService.getUserAuthorities(user);
                 return new UsernamePasswordAuthenticationToken(user, null, authorities);
             }
             return null;
