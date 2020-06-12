@@ -5,6 +5,7 @@ import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.mapstruct.factory.Mappers;
 import site.transcendence.userrestservice.api.requests.UserCreateRequest;
+import site.transcendence.userrestservice.api.roles.RoleMapper;
 
 /**
  * UserMapper is an interface used by MapStruct
@@ -13,7 +14,8 @@ import site.transcendence.userrestservice.api.requests.UserCreateRequest;
  * @see <a href="https://mapstruct.org/documentation/stable/reference/html/">MapStruct Documentation</a>
  */
 
-@Mapper(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+@Mapper(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
+        uses = {RoleMapper.class})
 public interface UserMapper {
 
     UserMapper INSTANCE = Mappers.getMapper(UserMapper.class);
@@ -22,9 +24,11 @@ public interface UserMapper {
     Mapping between UserDTO and UserEntity
      */
     UserEntity toEntity(UserDTO source);
+
     UserDTO toDTO(UserEntity source);
 
     void copy(UserEntity source, @MappingTarget UserDTO target);
+
     void copy(UserDTO source, @MappingTarget UserEntity target);
 
     /*

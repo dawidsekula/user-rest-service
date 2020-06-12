@@ -21,8 +21,11 @@ import static site.transcendence.userrestservice.security.SecurityConstant.*;
  */
 public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
 
-    public JWTAuthorizationFilter(AuthenticationManager authManager) {
+    private UserService userService;
+
+    public JWTAuthorizationFilter(AuthenticationManager authManager, UserService userService) {
         super(authManager);
+        this.userService = userService;
     }
 
     /**
@@ -54,23 +57,30 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
         chain.doFilter(request, response);
     }
 
-
     /**
      * Method gets token for validation and returns authentication if token is valid
      *
      * @param token value from request's header
      * @return authentication object
      */
-    private UsernamePasswordAuthenticationToken getAuthentication(String token) {
-        String user = JWT.require(Algorithm.HMAC512(TOKEN_SECRET)) // Decrypting token requires the same 'key' it was encrypted by
-                .build()
-                .verify(token.replace(TOKEN_PREFIX, "")) // Verifying token's validation
-                .getSubject(); // Getting subject/user from decrypted token's data
-        if (user != null) { // If user is not null, authentication for this user is created
-            return new UsernamePasswordAuthenticationToken(user, null, new ArrayList<>());
+    private UsernamePasswordAuthenticationToken getAuthentication(HttpServletRequest request){
+        String token = request.getHeader(HEADER_STRING);
+
+        if (token != null){
+            String user = JWT.require(Algorithm.HMAC512(TOKEN_SECRET)) // Decrypting token requires the same 'key' it was encrypted by
+                    .build()
+                    .verify(token.replace(TOKEN_PREFIX, "")) // Verifying token's validation
+                    .getSubject(); // Getting subject/user from decrypted token's data
+
+            if (user != null){
+                List<GrantedAuthority> authorities = userService.getUserAuthorities(user);
+                return new UsernamePasswordAuthenticationToken(user, null, authorities);
+            }
+            return null;
         }
 
         return null; // If user is null, null is returned giving no authentication
     }
+
 
 }

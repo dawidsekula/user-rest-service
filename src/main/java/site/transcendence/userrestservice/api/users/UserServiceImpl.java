@@ -1,19 +1,20 @@
 package site.transcendence.userrestservice.api.users;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import site.transcendence.userrestservice.api.requests.UserCreateRequest;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -22,6 +23,8 @@ public class UserServiceImpl implements UserService {
     private UserRepository userRepository;
     @Autowired
     private PasswordEncoder passwordEncoder;
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
     private UserMapper mapper = UserMapper.INSTANCE;
 
@@ -86,10 +89,27 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         UserEntity foundUser = getUserEntity(username);
+        List<GrantedAuthority> authorities = getUserAuthorities(username);
 
         return User.withUsername(foundUser.getUsername())
                 .password(foundUser.getEncryptedPassword())
-                .roles("USER")
+                .authorities(authorities)
                 .build();
     }
+
+    @Override
+    public List<GrantedAuthority> getUserAuthorities(String username){
+        return jdbcTemplate.queryForList(
+                "SELECT r.name " +
+                        "FROM roles r " +
+                        "INNER JOIN users_roles ur ON ur.role_id=r.role_id " +
+                        "INNER JOIN users u ON u.user_id=ur.user_id " +
+                        "WHERE u.username = ?" +
+                        "AND ur.user_id = u.user_id", String.class, username)
+                .stream()
+                .map(SimpleGrantedAuthority::new)
+                .collect(Collectors.toList());
+    }
+
+
 }
