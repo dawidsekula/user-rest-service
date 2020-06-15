@@ -26,16 +26,19 @@ import java.util.stream.Collectors;
 @Service
 public class UserServiceImpl implements UserService {
 
-    @Autowired
     private UserRepository userRepository;
-    @Autowired
     private PasswordEncoder passwordEncoder;
-    @Autowired
     private JdbcTemplate jdbcTemplate;
-    @Autowired
     private MailService mailService;
 
     private UserMapper mapper = UserMapper.INSTANCE;
+
+    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder, JdbcTemplate jdbcTemplate, MailService mailService) {
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.jdbcTemplate = jdbcTemplate;
+        this.mailService = mailService;
+    }
 
     @Override
     public UserDTO createUser(UserCreateRequest request) {

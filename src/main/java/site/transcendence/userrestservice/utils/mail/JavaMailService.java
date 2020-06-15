@@ -14,8 +14,11 @@ import static site.transcendence.userrestservice.common.MailMessages.*;
 @Service
 public class JavaMailService implements MailService{
 
-    @Autowired
     private JavaMailSender javaMailSender;
+
+    public JavaMailService(JavaMailSender javaMailSender) {
+        this.javaMailSender = javaMailSender;
+    }
 
     @Override
     public void sendRegistrationConfirmation(String email, String token){

@@ -15,10 +15,13 @@ import site.transcendence.userrestservice.api.users.UserService;
 @EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
-    @Autowired
     private UserService userService;
-    @Autowired
     private PasswordEncoder passwordEncoder;
+
+    public SecurityConfiguration(UserService userService, PasswordEncoder passwordEncoder){
+        this.userService = userService;
+        this.passwordEncoder = passwordEncoder;
+    }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {

@@ -16,8 +16,11 @@ import java.util.List;
 @RequestMapping("/api/v1/users")
 public class UserRestController {
 
-    @Autowired
     private UserService userService;
+
+    public UserRestController(UserService userService) {
+        this.userService = userService;
+    }
 
     @PostMapping
     public ResponseEntity<UserDTO> createUser(@Valid @RequestBody UserCreateRequest request){
