@@ -53,16 +53,20 @@ public class UserServiceImpl implements UserService {
         // Saved UserEntity with id set by repository is assigned to savedUser variable
         UserEntity savedUser = userRepository.save(createdUser);
 
-        // Mapping saved UserEntity to UserDTO
-        UserDTO resultUser = mapper.toDTO(savedUser);
-
         // Sending email with confirmation link
         // Depending on application properties, this service can be either enabled or disabled
         if (PropertiesConstant.REGISTRATION_CONFIRMATION_ENABLED) {
             mailService.sendRegistrationConfirmation(
-                    resultUser.getEmail(),
-                    resultUser.getEmailVerificationToken());
+                    savedUser.getEmail(),
+                    savedUser.getEmailVerificationToken());
+        }else{
+            savedUser.setEmailVerificationToken(null);
+            savedUser.setEmailVerified(true);
+            savedUser = userRepository.save(savedUser);
         }
+
+        // Mapping saved UserEntity to UserDTO
+        UserDTO resultUser = mapper.toDTO(savedUser);
 
         // Returning UserDTO
         return resultUser;

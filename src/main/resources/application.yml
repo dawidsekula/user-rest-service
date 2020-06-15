@@ -19,6 +19,9 @@ spring:
           auth: true
           starttls:
             enable: true
+springdoc:
+  swagger-ui:
+    operations-sorter: method
 site:
   transcendence:
     mail:
