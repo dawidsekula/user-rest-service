@@ -8,3 +8,18 @@ spring:
     database: mysql
     hibernate:
       ddl-auto: create-drop
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${gmail.login}
+    password: ${gmail.password}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+site:
+  transcendence:
+    mail:
+      registration-confirmation-enabled: true

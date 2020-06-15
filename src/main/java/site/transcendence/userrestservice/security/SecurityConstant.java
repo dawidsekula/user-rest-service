@@ -20,6 +20,7 @@ public class SecurityConstant {
      */
 
     public static final Long LOGIN_AUTHENTICATION_EXPIRATION_TIME = 120000L;
+    public static final Long EMAIL_VERIFICATION_EXPIRATION_TIME = 60000L;
     public static final Long PASSWORD_RESET_TOKEN_EXPIRATION_TIME = 300000L;
 
     public static final String TOKEN_PREFIX = "Bearer ";
@@ -29,7 +30,7 @@ public class SecurityConstant {
 
     public static final String SIGN_UP_URL = "/api/v1/users";
     public static final String LOGIN_URL = "/login";
-    public static final String EMAIL_VERIFICATION_URL = "/api/v1/users/email-verification";
+    public static final String EMAIL_VERIFICATION_URL = "/api/v1/users/verify-email";
     public static final String PASSWORD_RESET_REQUEST_URL = "/api/v1/users/password-reset-request";
     public static final String PASSWORD_RESET_URL = "/api/v1/users/password-reset";
 

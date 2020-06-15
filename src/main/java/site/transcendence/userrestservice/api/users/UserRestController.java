@@ -39,4 +39,11 @@ public class UserRestController {
         return "Deleted";
     }
 
+    //TODO: In MailMessages.class address is in parts as variables, make use of it
+    @GetMapping("/verify-email")
+    public String verifyEmail(@RequestParam("token") String token){
+        userService.verifyEmail(token);
+        return "Email verified";
+    }
+
 }

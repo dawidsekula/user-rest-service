@@ -32,8 +32,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 */
                 .authorizeRequests() // Authorize all following requests
                 .antMatchers(HttpMethod.POST, SecurityConstant.SIGN_UP_URL).permitAll() // POST request for signing up URL
-//                .antMatchers("/test/admin").hasRole("ADMIN")
-//                .antMatchers("/test/user").hasRole("USER")
+                .antMatchers(HttpMethod.GET, SecurityConstant.EMAIL_VERIFICATION_URL).permitAll()
+                .antMatchers("/test").permitAll() // NOTE FOR TEST ONLY
                 .anyRequest().authenticated() // All requests for authenticated users
 
                 .and()

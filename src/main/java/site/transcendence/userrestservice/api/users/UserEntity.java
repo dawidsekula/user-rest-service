@@ -34,6 +34,10 @@ public class UserEntity implements Serializable {
     @Column(unique = true, length = 100)
     private String email;
 
+    private String emailVerificationToken;
+
+    private boolean isEmailVerified;
+
     @ManyToMany
     @JoinTable(name = "users_roles",
             joinColumns = @JoinColumn(name = "user_id"),

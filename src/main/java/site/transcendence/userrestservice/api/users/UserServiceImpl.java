@@ -10,7 +10,12 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import site.transcendence.userrestservice.api.requests.UserCreateRequest;
+import site.transcendence.userrestservice.configuration.PropertiesConstants;
+import site.transcendence.userrestservice.utils.JWTUtil;
+import site.transcendence.userrestservice.utils.mail.JavaMailService;
+import site.transcendence.userrestservice.utils.mail.MailService;
 
+import javax.mail.MessagingException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -25,6 +30,8 @@ public class UserServiceImpl implements UserService {
     private PasswordEncoder passwordEncoder;
     @Autowired
     private JdbcTemplate jdbcTemplate;
+    @Autowired
+    private MailService mailService;
 
     private UserMapper mapper = UserMapper.INSTANCE;
 
@@ -36,12 +43,22 @@ public class UserServiceImpl implements UserService {
         // Encrypting password from UserCreateRequest and setting it to UserEntity
         createdUser.setEncryptedPassword(passwordEncoder.encode(request.getPassword()));
 
+        // Setting email verification token
+        createdUser.setEmailVerificationToken(JWTUtil.generateEmailVerificationToken(createdUser.getUsername()));
+        createdUser.setEmailVerified(false);
+
         // Saving created UserEntity to repository
         // Saved UserEntity with id set by repository is assigned to savedUser variable
         UserEntity savedUser = userRepository.save(createdUser);
 
         // Mapping saved UserEntity to UserDTO
         UserDTO resultUser = mapper.toDTO(savedUser);
+
+        // Sending email with confirmation link
+        // Depending on application properties, this service can be either enabled or disabled
+        if (PropertiesConstants.REGISTRATION_CONFIRMATION_ENABLED){
+            mailService.sendRegistrationConfirmation(resultUser, resultUser.getEmailVerificationToken());
+        }
 
         // Returning UserDTO
         return resultUser;
@@ -53,13 +70,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserDTO> getUsers(){
+    public List<UserDTO> getUsers() {
         Iterable<UserEntity> userEntityIterable = userRepository.findAll();
         List<UserDTO> resultList = new ArrayList<>();
 
         userEntityIterable.forEach(userEntity -> {
             resultList.add(mapper.toDTO(userEntity));
-        } );
+        });
 
         return resultList;
     }
@@ -93,12 +110,13 @@ public class UserServiceImpl implements UserService {
 
         return User.withUsername(foundUser.getUsername())
                 .password(foundUser.getEncryptedPassword())
+                .disabled(!foundUser.isEmailVerified())
                 .authorities(authorities)
                 .build();
     }
 
     @Override
-    public List<GrantedAuthority> getUserAuthorities(String username){
+    public List<GrantedAuthority> getUserAuthorities(String username) {
         return jdbcTemplate.queryForList(
                 "SELECT r.name " +
                         "FROM roles r " +
@@ -109,6 +127,20 @@ public class UserServiceImpl implements UserService {
                 .stream()
                 .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public void verifyEmail(String token){
+        Optional<UserEntity> foundUser = userRepository.findByEmailVerificationToken(token);
+
+        if(foundUser.isPresent() && !JWTUtil.hasTokenExpired(token)){
+            UserEntity user = foundUser.get();
+            user.setEmailVerified(true);
+            user.setEmailVerificationToken(null);
+
+            userRepository.save(user);
+        }
+
     }
 
 

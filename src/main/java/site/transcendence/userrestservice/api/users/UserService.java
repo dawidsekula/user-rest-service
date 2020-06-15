@@ -13,7 +13,9 @@ public interface UserService extends UserDetailsService {
 
     // READ
     UserDTO getUser(String username);
+
     UserEntity getUserEntity(String username);
+
     List<UserDTO> getUsers();
 
     // UPDATE
@@ -24,7 +26,8 @@ public interface UserService extends UserDetailsService {
 
     // OTHERS
     List<GrantedAuthority> getUserAuthorities(String username);
-//    List<UserDTO> getUsersByRoles(String... roleName);
-//    List<UserDTO> getUsersByAuthorities(String... authorityName);
+    //    List<UserDTO> getUsersByRoles(String... roleName);
+    //    List<UserDTO> getUsersByAuthorities(String... authorityName);
+    void verifyEmail(String token);
 
 }

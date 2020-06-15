@@ -12,6 +12,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import site.transcendence.userrestservice.api.requests.UserLogInRequest;
+import site.transcendence.userrestservice.utils.JWTUtil;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -64,25 +65,18 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     }
 
     /**
-     * Successful authentication creates JSON Web Token for the user which is passed to the header
-     * named after constant's SecurityConstant.HEADER_STRING value along with SecurityConstant.TOKEN_PREFIX
-     * constant's value
-     *
-     * Token valid time is set as constant's SecurityConstant.LOGIN_AUTHENTICATION_EXPIRATION_TIME value
-     * and is signed with constant's SecurityConstant.TOKEN_SECRET value
-     *
-     * NOTE Token is used for authentication only and user's authorities SHOULD NOT be included
+     * Method gets authenticated user's username and passes based on it generated JSON Web Token to response's header
      */
     @Override
     protected void successfulAuthentication(HttpServletRequest request,
                                             HttpServletResponse response,
                                             FilterChain chain,
                                             Authentication authResult) throws IOException, ServletException {
+        // Getting authenticated user's username
+        String username = ((User) authResult.getPrincipal()).getUsername();
+
         // Creating personalized token
-        String token = JWT.create()
-                .withSubject(((User) authResult.getPrincipal()).getUsername()) // Getting user's username
-                .withExpiresAt(new Date(System.currentTimeMillis() + LOGIN_AUTHENTICATION_EXPIRATION_TIME)) // Setting expiration time of token
-                .sign(Algorithm.HMAC512(TOKEN_SECRET.getBytes())); // Encrypting token
+        String token = JWTUtil.generateAuthenticationToken(username);
 
         // Creating header with created token
         response.addHeader(HEADER_STRING, TOKEN_PREFIX + token);
