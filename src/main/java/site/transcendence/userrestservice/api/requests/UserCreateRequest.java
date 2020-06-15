@@ -14,14 +14,11 @@ import javax.validation.constraints.Size;
 @Setter
 
 @PasswordConfirmed
-public class UserCreateRequest {
+public class UserCreateRequest extends RequestWithPasswords{
 
     @UniqueUsername
     @Size(min = 2, max = 20)
     private String username;
-    @PasswordPolicy
-    private String password;
-    private String passwordConfirmation;
     @UniqueEmail
     @Size(max = 100)
     @Email

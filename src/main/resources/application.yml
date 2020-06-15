@@ -3,11 +3,11 @@ spring:
     url: jdbc:mysql://localhost:3306/user_rest_service_database?serverTimezone=CET
     username: root
     password: root
-    initialization-mode: always
+    initialization-mode: never
   jpa:
     database: mysql
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: update
   mail:
     host: smtp.gmail.com
     port: 587
@@ -23,3 +23,4 @@ site:
   transcendence:
     mail:
       registration-confirmation-enabled: true
+      password-reset-enabled: true

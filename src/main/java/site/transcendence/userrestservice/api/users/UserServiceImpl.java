@@ -9,13 +9,13 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import site.transcendence.userrestservice.api.requests.PasswordResetRequest;
 import site.transcendence.userrestservice.api.requests.UserCreateRequest;
-import site.transcendence.userrestservice.configuration.PropertiesConstants;
+import site.transcendence.userrestservice.configuration.PropertiesConstant;
 import site.transcendence.userrestservice.utils.JWTUtil;
-import site.transcendence.userrestservice.utils.mail.JavaMailService;
 import site.transcendence.userrestservice.utils.mail.MailService;
 
-import javax.mail.MessagingException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -56,8 +56,10 @@ public class UserServiceImpl implements UserService {
 
         // Sending email with confirmation link
         // Depending on application properties, this service can be either enabled or disabled
-        if (PropertiesConstants.REGISTRATION_CONFIRMATION_ENABLED){
-            mailService.sendRegistrationConfirmation(resultUser, resultUser.getEmailVerificationToken());
+        if (PropertiesConstant.REGISTRATION_CONFIRMATION_ENABLED) {
+            mailService.sendRegistrationConfirmation(
+                    resultUser.getEmail(),
+                    resultUser.getEmailVerificationToken());
         }
 
         // Returning UserDTO
@@ -82,6 +84,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public UserDTO updateUser(String username, UserDTO updatedUser) {
         return null;
     }
@@ -130,10 +133,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void verifyEmail(String token){
+    @Transactional
+    public void verifyEmail(String token) {
         Optional<UserEntity> foundUser = userRepository.findByEmailVerificationToken(token);
 
-        if(foundUser.isPresent() && !JWTUtil.hasTokenExpired(token)){
+        if (foundUser.isPresent() && !JWTUtil.hasTokenExpired(token)) {
             UserEntity user = foundUser.get();
             user.setEmailVerified(true);
             user.setEmailVerificationToken(null);
@@ -143,5 +147,48 @@ public class UserServiceImpl implements UserService {
 
     }
 
+    @Override
+    public void requestPasswordReset(String email) {
+        if (!PropertiesConstant.PASSWORD_RESET_ENABLED){
+            throw new RuntimeException("Password reset is not enabled");
+        }
 
+        Optional<UserEntity> foundUser = userRepository.findByEmail(email);
+
+        if (foundUser.isPresent()) {
+            UserEntity user = foundUser.get();
+            String token = JWTUtil.generatePasswordResetToken(user.getUsername());
+            user.setPasswordResetToken(token);
+            userRepository.save(user);
+
+            mailService.sendPasswordResetRequest(
+                    user.getUsername(),
+                    user.getEmail(),
+                    user.getPasswordResetToken()
+            );
+        }
+
+    }
+
+    @Override
+    @Transactional
+    public void resetPassword(String token, PasswordResetRequest request) {
+        if (!PropertiesConstant.PASSWORD_RESET_ENABLED){
+            throw new RuntimeException("Password reset is not enabled");
+        }
+
+        Optional<UserEntity> foundUser = userRepository.findByPasswordResetToken(token);
+
+        if (foundUser.isPresent() && !JWTUtil.hasTokenExpired(token)){
+            UserEntity user = foundUser.get();
+            user.setEncryptedPassword(
+                    passwordEncoder.encode(request.getPassword())
+            );
+            user.setPasswordResetToken(null);
+            userRepository.save(user);
+        }else{
+            throw new RuntimeException("Password cannot be changed");
+        }
+
+    }
 }

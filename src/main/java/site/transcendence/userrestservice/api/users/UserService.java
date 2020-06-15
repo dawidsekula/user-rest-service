@@ -2,6 +2,7 @@ package site.transcendence.userrestservice.api.users;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import site.transcendence.userrestservice.api.requests.PasswordResetRequest;
 import site.transcendence.userrestservice.api.requests.UserCreateRequest;
 
 import java.util.List;
@@ -29,5 +30,6 @@ public interface UserService extends UserDetailsService {
     //    List<UserDTO> getUsersByRoles(String... roleName);
     //    List<UserDTO> getUsersByAuthorities(String... authorityName);
     void verifyEmail(String token);
-
+    void requestPasswordReset(String email);
+    void resetPassword(String token, PasswordResetRequest request);
 }

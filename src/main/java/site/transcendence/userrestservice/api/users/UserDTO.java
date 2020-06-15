@@ -20,9 +20,12 @@ public class UserDTO implements Serializable {
 
     private Long id;
     private String username;
+
     private String email;
     private String emailVerificationToken;
     private boolean isEmailVerified;
+
+    private String passwordResetToken;
 
     private Set<RoleDTO> roles;
 

@@ -32,7 +32,7 @@ public class SecurityConstant {
     public static final String LOGIN_URL = "/login";
     public static final String EMAIL_VERIFICATION_URL = "/api/v1/users/verify-email";
     public static final String PASSWORD_RESET_REQUEST_URL = "/api/v1/users/password-reset-request";
-    public static final String PASSWORD_RESET_URL = "/api/v1/users/password-reset";
+    public static final String PASSWORD_RESET_URL = "/api/v1/users/reset-password";
 
 
 }

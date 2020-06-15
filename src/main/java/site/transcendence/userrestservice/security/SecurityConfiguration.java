@@ -31,8 +31,11 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 Authorization requests
                 */
                 .authorizeRequests() // Authorize all following requests
-                .antMatchers(HttpMethod.POST, SecurityConstant.SIGN_UP_URL).permitAll() // POST request for signing up URL
-                .antMatchers(HttpMethod.GET, SecurityConstant.EMAIL_VERIFICATION_URL).permitAll()
+                .antMatchers(HttpMethod.POST, SecurityConstant.SIGN_UP_URL).permitAll() // User registration
+                .antMatchers(HttpMethod.GET, SecurityConstant.EMAIL_VERIFICATION_URL).permitAll() // Email confirmation
+                .antMatchers(HttpMethod.POST, SecurityConstant.PASSWORD_RESET_REQUEST_URL).permitAll() // Requesting password reset
+                .antMatchers(HttpMethod.POST, SecurityConstant.PASSWORD_RESET_URL).permitAll() // Resetting password
+
                 .antMatchers("/test").permitAll() // NOTE FOR TEST ONLY
                 .anyRequest().authenticated() // All requests for authenticated users
 

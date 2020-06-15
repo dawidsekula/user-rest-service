@@ -4,7 +4,7 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import site.transcendence.userrestservice.configuration.PropertiesConstants;
+import site.transcendence.userrestservice.configuration.PropertiesConstant;
 
 @RestController
 @RequestMapping("/test")
@@ -29,7 +29,7 @@ public class SecurityTestController {
 
     @GetMapping
     public String test() {
-        String message = "Value: " + PropertiesConstants.REGISTRATION_CONFIRMATION_ENABLED;
+        String message = "Value: " + PropertiesConstant.REGISTRATION_CONFIRMATION_ENABLED;
 
         return message;
     }

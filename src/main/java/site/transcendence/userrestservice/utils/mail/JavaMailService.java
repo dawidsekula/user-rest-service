@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
-import site.transcendence.userrestservice.api.users.UserDTO;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
@@ -18,7 +17,7 @@ public class JavaMailService implements MailService{
     private JavaMailSender javaMailSender;
 
     @Override
-    public void sendRegistrationConfirmation(UserDTO user, String token){
+    public void sendRegistrationConfirmation(String email, String token){
         String htmlBodyWithToken = REGISTRATION_HTML_BODY.replace(TOKEN_URL_VALUE, token);
         String textBodyWithToken = REGISTRATION_TEXT_BODY.replace(TOKEN_URL_VALUE, token);
 
@@ -26,7 +25,7 @@ public class JavaMailService implements MailService{
             MimeMessage message = javaMailSender.createMimeMessage();
             MimeMessageHelper messageHelper = new MimeMessageHelper(message, true);
 
-            messageHelper.setTo(user.getEmail());
+            messageHelper.setTo(email);
             messageHelper.setSubject(REGISTRATION_SUBJECT);
             messageHelper.setText(textBodyWithToken, htmlBodyWithToken);
 
@@ -34,12 +33,30 @@ public class JavaMailService implements MailService{
         }catch (MessagingException e){
             throw new RuntimeException(e);
         }
-
     }
 
+    @Override
+    public void sendPasswordResetRequest(String username, String email, String token) {
+        String htmlBodyWithToken = PASSWORD_RESET_HTML_BODY
+                .replace(USERNAME_VALUE, username)
+                .replace(TOKEN_URL_VALUE, token);
+        String textBodyWithToken = PASSWORD_RESET_TEXT_BODY
+                .replace(USERNAME_VALUE, username)
+                .replace(TOKEN_URL_VALUE, token);
+
+        try {
+            MimeMessage message = javaMailSender.createMimeMessage();
+            MimeMessageHelper messageHelper = new MimeMessageHelper(message, true);
+
+            messageHelper.setTo(email);
+            messageHelper.setSubject(PASSWORD_RESET_SUBJECT);
+            messageHelper.setText(textBodyWithToken, htmlBodyWithToken);
+
+            javaMailSender.send(message);
+        }catch (MessagingException e){
+            throw new RuntimeException(e);
+        }
 
 
-
-
-
+    }
 }

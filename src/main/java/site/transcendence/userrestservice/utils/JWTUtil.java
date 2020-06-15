@@ -40,16 +40,15 @@ public class JWTUtil {
     }
 
     public static boolean hasTokenExpired(String token){
-        //        try {
-        //            JWTVerifier verifier = JWT
-        //                    .require(Algorithm.HMAC512(TOKEN_SECRET))
-        //                    .build();
-        //            verifier.verify(token);
-        //        } catch (JWTVerificationException exception){
-        //            throw new RuntimeException(exception);
-        //        }
-        //        return false;
-        return JWT.decode(token).getExpiresAt().before(new Date());
+                try {
+                    JWTVerifier verifier = JWT
+                            .require(Algorithm.HMAC512(TOKEN_SECRET))
+                            .build();
+                    verifier.verify(token);
+                } catch (JWTVerificationException exception){
+                    throw new RuntimeException(exception);
+                }
+                return false;
     }
 
 

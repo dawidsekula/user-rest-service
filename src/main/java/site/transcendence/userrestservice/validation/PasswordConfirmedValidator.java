@@ -1,16 +1,16 @@
 package site.transcendence.userrestservice.validation;
 
-import site.transcendence.userrestservice.api.requests.UserCreateRequest;
+import site.transcendence.userrestservice.api.requests.RequestWithPasswords;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
-public class PasswordConfirmedValidator implements ConstraintValidator<PasswordConfirmed, Object> {
+public class PasswordConfirmedValidator implements ConstraintValidator<PasswordConfirmed, RequestWithPasswords> {
 
     @Override
-    public boolean isValid(Object user, ConstraintValidatorContext context) {
-        String password = ((UserCreateRequest)user).getPassword();
-        String confirmedPassword = ((UserCreateRequest)user).getPasswordConfirmation();
+    public boolean isValid(RequestWithPasswords request, ConstraintValidatorContext context) {
+        String password = request.getPassword();
+        String confirmedPassword = request.getPasswordConfirmation();
         return password.equals(confirmedPassword);
     }
 
