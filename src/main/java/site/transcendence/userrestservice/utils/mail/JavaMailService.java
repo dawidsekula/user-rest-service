@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
+import site.transcendence.userrestservice.exception.SendingEmailException;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
@@ -31,7 +32,7 @@ public class JavaMailService implements MailService{
 
             javaMailSender.send(message);
         }catch (MessagingException e){
-            throw new RuntimeException(e);
+            throw new SendingEmailException(e.getLocalizedMessage());
         }
     }
 
@@ -54,9 +55,10 @@ public class JavaMailService implements MailService{
 
             javaMailSender.send(message);
         }catch (MessagingException e){
-            throw new RuntimeException(e);
+            throw new SendingEmailException(e.getLocalizedMessage());
         }
-
-
     }
+
+
+
 }

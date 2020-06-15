@@ -1,6 +1,8 @@
 package site.transcendence.userrestservice.api.users;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -18,45 +20,45 @@ public class UserRestController {
     private UserService userService;
 
     @PostMapping
-    public UserDTO createUser(@Valid @RequestBody UserCreateRequest request){
-        return userService.createUser(request);
+    public ResponseEntity<UserDTO> createUser(@Valid @RequestBody UserCreateRequest request){
+        return new ResponseEntity<>(userService.createUser(request), HttpStatus.CREATED);
     }
 
     @PreAuthorize("#username == authentication.name or hasRole('ROLE_ADMIN')")
     @GetMapping("/{username}")
-    public UserDTO getUser(@PathVariable("username") String username){
-        return userService.getUser(username);
+    public ResponseEntity<UserDTO> getUser(@PathVariable("username") String username){
+        return new ResponseEntity<>(userService.getUser(username), HttpStatus.FOUND);
     }
 
     @GetMapping
-    public List<UserDTO> getUsers(){
-        return userService.getUsers();
+    public ResponseEntity<List<UserDTO>> getUsers(){
+        return new ResponseEntity<>(userService.getUsers(), HttpStatus.OK);
     }
 
     @Secured({"ROLE_ADMIN"})
     @DeleteMapping("/{username}")
-    public String deleteUser(@PathVariable("username") String username){
+    public ResponseEntity deleteUser(@PathVariable("username") String username){
         userService.deleteUser(username);
-        return "Deleted";
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @GetMapping("/verify-email")
-    public String verifyEmail(@RequestParam("token") String token){
+    public ResponseEntity verifyEmail(@RequestParam("token") String token){
         userService.verifyEmail(token);
-        return "Email verified";
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PostMapping("/password-reset-request")
-    public String requestPasswordReset(@RequestParam("email") String email){
+    public ResponseEntity requestPasswordReset(@RequestParam("email") String email){
         userService.requestPasswordReset(email);
-        return "If email is registered in our app, you should get the message with password reset link";
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PostMapping("/reset-password")
-    public String resetPassword(@RequestParam("token") String token,
+    public ResponseEntity resetPassword(@RequestParam("token") String token,
                                 @RequestBody @Valid PasswordResetRequest request){
         userService.resetPassword(token, request);
-        return "Password changed";
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
 

@@ -8,6 +8,7 @@ import site.transcendence.userrestservice.validation.UniqueEmail;
 import site.transcendence.userrestservice.validation.UniqueUsername;
 
 import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
 @Getter
@@ -22,6 +23,7 @@ public class UserCreateRequest extends RequestWithPasswords{
     @UniqueEmail
     @Size(max = 100)
     @Email
+    @NotBlank
     private String email;
 
 }

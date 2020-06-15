@@ -13,6 +13,8 @@ import org.springframework.transaction.annotation.Transactional;
 import site.transcendence.userrestservice.api.requests.PasswordResetRequest;
 import site.transcendence.userrestservice.api.requests.UserCreateRequest;
 import site.transcendence.userrestservice.configuration.PropertiesConstant;
+import site.transcendence.userrestservice.exception.PasswordResetException;
+import site.transcendence.userrestservice.exception.UserNotFoundException;
 import site.transcendence.userrestservice.utils.JWTUtil;
 import site.transcendence.userrestservice.utils.mail.MailService;
 
@@ -102,7 +104,7 @@ public class UserServiceImpl implements UserService {
         if (foundUser.isPresent()) {
             return foundUser.get();
         } else {
-            throw new RuntimeException("User does not exist, username: " + username);
+            throw new UserNotFoundException("User has not been found. Requested user: " + username);
         }
     }
 
@@ -150,7 +152,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void requestPasswordReset(String email) {
         if (!PropertiesConstant.PASSWORD_RESET_ENABLED){
-            throw new RuntimeException("Password reset is not enabled");
+            throw new PasswordResetException("Password reset is disabled");
         }
 
         Optional<UserEntity> foundUser = userRepository.findByEmail(email);
@@ -167,14 +169,13 @@ public class UserServiceImpl implements UserService {
                     user.getPasswordResetToken()
             );
         }
-
     }
 
     @Override
     @Transactional
     public void resetPassword(String token, PasswordResetRequest request) {
         if (!PropertiesConstant.PASSWORD_RESET_ENABLED){
-            throw new RuntimeException("Password reset is not enabled");
+            throw new PasswordResetException("Password reset is disabled");
         }
 
         Optional<UserEntity> foundUser = userRepository.findByPasswordResetToken(token);
@@ -187,7 +188,7 @@ public class UserServiceImpl implements UserService {
             user.setPasswordResetToken(null);
             userRepository.save(user);
         }else{
-            throw new RuntimeException("Password cannot be changed");
+            throw new PasswordResetException("Password reset has failed, try again");
         }
 
     }

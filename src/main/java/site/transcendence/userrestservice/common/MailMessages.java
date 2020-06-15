@@ -44,6 +44,7 @@ public class MailMessages {
     public static final String PASSWORD_RESET_SUBJECT = "Password reset requested";
 
     //HTML body for the email;
+    //NOTE that URL should be to the page with form, not directly to POST request which demands body with new password
     public static final String PASSWORD_RESET_HTML_BODY = "<h1>A request to reset your password</h1> " +
             "<p>Hi " + USERNAME_VALUE + " <br/>" +
             "Someone has requested to reset your password to our service. If it was not you please ignore this message, " +
@@ -53,6 +54,7 @@ public class MailMessages {
             "Thank you!";
 
     //Email body for non-HTML email clients;
+    //NOTE that URL should be to the page with form, not directly to POST request which demands body with new password
     public static final String PASSWORD_RESET_TEXT_BODY = "A request to reset your password " +
             "Hi " + USERNAME_VALUE +
             "! Someone has requested to reset your password to our service. If it was not you please ignore this message, " +
