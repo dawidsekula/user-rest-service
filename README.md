@@ -5,6 +5,7 @@ TO DO:
 - implement privileges as part of roles'
 - updating own user's account
 - tests
+- HATEOAS
 ```
 
 ## User REST Service
