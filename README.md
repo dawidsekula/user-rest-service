@@ -6,13 +6,13 @@ TO DO:
 - updating own user's account
 ```
 
-#User REST Service
+## User REST Service
 
 Application allows user to register new account with an email verification. Registered and 
 confirmed user can gain access to application by using his credentials or by generated JSON 
 Web Token. User can also reset his password.
 
-#Details
+## Details
 
 * Registration
     * Unauthenticated users can create new account
