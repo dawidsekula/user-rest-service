@@ -4,6 +4,7 @@ TO DO:
 - better exception handling
 - implement privileges as part of roles'
 - updating own user's account
+- tests
 ```
 
 ## User REST Service
