@@ -8,7 +8,6 @@ TO DO:
 - HATEOAS
 ```
 
-
 ## User REST Service
 
 Application allows user to register new account with an email verification. Registered and 
